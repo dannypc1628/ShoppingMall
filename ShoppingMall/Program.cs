@@ -6,7 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ShoppingmallContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("SchoolContext")));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("SchoolContext"), contextOptionsBuilder =>
+            {
+                contextOptionsBuilder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            }));
 
 var app = builder.Build();
 
