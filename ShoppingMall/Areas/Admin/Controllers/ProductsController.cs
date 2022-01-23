@@ -1,12 +1,9 @@
 ﻿#nullable disable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ShoppingMall.Models;
+using ShoppingMall.Services;
 
 namespace ShoppingMall.Areas.Admin.Controllers
 {
@@ -14,30 +11,24 @@ namespace ShoppingMall.Areas.Admin.Controllers
     public class ProductsController : Controller
     {
         private readonly ShoppingmallContext _context;
+        private readonly IProductService _productServices;
 
-        public ProductsController(ShoppingmallContext context)
+        public ProductsController(ShoppingmallContext context, IProductService productServices)
         {
             _context = context;
+            _productServices = productServices;
         }
 
         // GET: Admin/Products
         public async Task<IActionResult> Index()
         {
-            var shoppingmallContext = _context.Product.Include(p => p.Catalog);
-            return View(await shoppingmallContext.ToListAsync());
+            return View(await _productServices.GetAllAsync());
         }
 
         // GET: Admin/Products/Details/5
-        public async Task<IActionResult> Details(Guid? id)
+        public async Task<IActionResult> Details(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Product
-                .Include(p => p.Catalog)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var product = await _productServices.GetAsync(id);
             if (product == null)
             {
                 return NotFound();
@@ -58,28 +49,22 @@ namespace ShoppingMall.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Summary,Description,UnitPrice,Count,CatalogId")] Product product)
+        public async Task<IActionResult> Create([Bind("Name,Summary,Description,UnitPrice,Count,CatalogId")] Product product)
         {
             if (ModelState.IsValid)
             {
-                product.Id = Guid.NewGuid();
-                _context.Add(product);
-                await _context.SaveChangesAsync();
+                await _productServices.CreateAsync(product);
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["CatalogId"] = new SelectList(_context.Catalog, "Id", "Name", product.CatalogId);
             return View(product);
         }
 
         // GET: Admin/Products/Edit/5
-        public async Task<IActionResult> Edit(Guid? id)
+        public async Task<IActionResult> Edit(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Product.FindAsync(id);
+            var product = await _productServices.GetAsync(id);
             if (product == null)
             {
                 return NotFound();
