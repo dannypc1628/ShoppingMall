@@ -3,43 +3,46 @@ using ShoppingMall.Models;
 
 namespace ShoppingMall.Services
 {
-    public class ProductServices
+    public class ProductService : IProductService
     {
         private readonly ShoppingmallContext _context;
 
         public readonly DbSet<Product> _products;
 
-        public ProductServices(ShoppingmallContext context)
+        public ProductService(ShoppingmallContext context)
         {
             _context = context;
             _products = _context.Product;
         }
 
-        public IList<Product> GetAll()
+        public async Task<IList<Product>> GetAllAsync()
         {
-            return _products.ToList();
+            return await _products.Include(d => d.Catalog).ToListAsync();
         }
 
-        public Product Get(Guid id)
+        public async Task<Product> GetAsync(Guid id)
         {
-            return _products.Find(id);
+            return await _products.Include(d => d.Catalog).FirstOrDefaultAsync(d => d.Id == id);
         }
 
-        public Product Create(Product product)
+        public async Task<Product> CreateAsync(Product product)
         {
             product.Id = Guid.NewGuid();
 
             _products.Add(product);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return product;
         }
 
-        public Product Update(Product product)
+        public async Task<Product> UpdateAsync(Product product)
         {
             var orignalProduct = _products.Find(product.Id);
 
-            if (orignalProduct == null) return null;
+            if (orignalProduct == null)
+            {
+                return null;
+            }
 
             orignalProduct.CatalogId = product.CatalogId;
             orignalProduct.Count = product.Count;
@@ -48,20 +51,23 @@ namespace ShoppingMall.Services
             orignalProduct.Summary = product.Summary;
             orignalProduct.UnitPrice = product.UnitPrice;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return orignalProduct;
         }
 
-        public bool Delete(Guid id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
-            var product = _products.Find(id);
-            if (product == null) return false;
+            var product = await _products.FindAsync(id);
+            if (product == null)
+            {
+                return false;
+            }
 
             try
             {
                 _products.Remove(product);
-                _context.SaveChanges(true);
+                await _context.SaveChangesAsync(true);
                 return true;
             }
             catch (Exception ex)

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ShoppingMall.Models;
+using ShoppingMall.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services.AddDbContext<ShoppingmallContext>(options =>
             {
                 contextOptionsBuilder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
             }));
+
+builder.Services.AddTransient<IProductService, ProductService>();
 
 var app = builder.Build();
 
