@@ -13,7 +13,7 @@ builder.Services.AddDbContext<ShoppingmallContext>(options =>
             }));
 
 builder.Services.AddTransient<IProductService, ProductService>();
-
+builder.Services.AddTransient<ICatalogService, CatalogService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
