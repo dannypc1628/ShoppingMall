@@ -87,7 +87,7 @@ namespace ShoppingMall.Areas.Admin.Controllers
             }
 
             ViewData["CatalogId"] = new SelectList(_context.Catalog, "Id", "Name", product.CatalogId);
-            return View(product);
+            return View(product.ToProductViewModel());
         }
 
         // POST: Admin/Products/Edit/5
