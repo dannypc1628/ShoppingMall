@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using ShoppingMall.Extensions;
 using ShoppingMall.Models;
+using ShoppingMall.Models.ViewModels;
 using ShoppingMall.Services;
 
 namespace ShoppingMall.Areas.Admin.Controllers
@@ -10,11 +12,13 @@ namespace ShoppingMall.Areas.Admin.Controllers
     [Area("Admin")]
     public class ProductsController : Controller
     {
+        private readonly IWebHostEnvironment _webHostEnvionment;
         private readonly ShoppingmallContext _context;
         private readonly IProductService _productServices;
 
-        public ProductsController(ShoppingmallContext context, IProductService productServices)
+        public ProductsController(ShoppingmallContext context, IProductService productServices, IWebHostEnvironment webHostEnvironment)
         {
+            _webHostEnvionment = webHostEnvironment;
             _context = context;
             _productServices = productServices;
         }
@@ -49,16 +53,28 @@ namespace ShoppingMall.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Summary,Description,UnitPrice,Count,CatalogId")] Product product)
+        public async Task<IActionResult> Create(ProductViewModel productViewModel)
         {
             if (ModelState.IsValid)
             {
-                await _productServices.CreateAsync(product);
+                var picturePath = string.Empty;
+                if (productViewModel.Picture != null)
+                {
+                    var fileName = Guid.NewGuid().ToString();
+                    var fileExtension = Path.GetExtension(productViewModel.Picture.FileName);
+                    picturePath = $"/img/{fileName}{fileExtension}";
+                    using (var stream = System.IO.File.Create($"{_webHostEnvionment.WebRootPath}{picturePath}"))
+                    {
+                        await productViewModel.Picture.CopyToAsync(stream);
+                    }
+                }
+
+                await _productServices.CreateAsync(productViewModel.ToProduct(picturePath));
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["CatalogId"] = new SelectList(_context.Catalog, "Id", "Name", product.CatalogId);
-            return View(product);
+            ViewData["CatalogId"] = new SelectList(_context.Catalog, "Id", "Name", productViewModel.CatalogId);
+            return View(productViewModel);
         }
 
         // GET: Admin/Products/Edit/5
@@ -69,6 +85,7 @@ namespace ShoppingMall.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+
             ViewData["CatalogId"] = new SelectList(_context.Catalog, "Id", "Name", product.CatalogId);
             return View(product);
         }
