@@ -10,6 +10,8 @@
         public int Count { get; set; }
         public int CatalogId { get; set; }
 
+        public string PicturePath { get; set; }
+
         public IFormFile Picture { get; set; }
 
     }
