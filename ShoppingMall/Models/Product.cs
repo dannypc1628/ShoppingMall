@@ -19,6 +19,7 @@ namespace ShoppingMall.Models
         public decimal UnitPrice { get; set; }
         public int Count { get; set; }
         public int CatalogId { get; set; }
+        public string PicturePath { get; set; }
 
         public virtual Catalog Catalog { get; set; }
         public virtual ICollection<Cart> Cart { get; set; }

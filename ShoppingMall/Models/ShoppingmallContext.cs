@@ -26,11 +26,6 @@ namespace ShoppingMall.Models
         public virtual DbSet<Product> Product { get; set; }
         public virtual DbSet<User> User { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-          
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Bill>(entity =>
@@ -112,13 +107,13 @@ namespace ShoppingMall.Models
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.Description).IsRequired();
-
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(e => e.Summary).IsRequired();
+                entity.Property(e => e.PicturePath)
+                    .HasMaxLength(50)
+                    .IsFixedLength();
 
                 entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 0)");
 
