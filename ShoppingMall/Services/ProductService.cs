@@ -48,6 +48,7 @@ namespace ShoppingMall.Services
             orignalProduct.Count = product.Count;
             orignalProduct.Description = product.Description;
             orignalProduct.Name = product.Name;
+            orignalProduct.PicturePath = product.PicturePath;
             orignalProduct.Summary = product.Summary;
             orignalProduct.UnitPrice = product.UnitPrice;
 
