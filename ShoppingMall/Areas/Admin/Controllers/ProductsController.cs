@@ -12,13 +12,13 @@ namespace ShoppingMall.Areas.Admin.Controllers
     [Area("Admin")]
     public class ProductsController : Controller
     {
-        private readonly IWebHostEnvironment _webHostEnvionment;
+        private readonly IFileService _fileService;
         private readonly ShoppingmallContext _context;
         private readonly IProductService _productServices;
 
-        public ProductsController(ShoppingmallContext context, IProductService productServices, IWebHostEnvironment webHostEnvironment)
+        public ProductsController(ShoppingmallContext context, IProductService productServices, IFileService fileService)
         {
-            _webHostEnvionment = webHostEnvironment;
+            _fileService = fileService;
             _context = context;
             _productServices = productServices;
         }
@@ -60,13 +60,7 @@ namespace ShoppingMall.Areas.Admin.Controllers
                 var picturePath = string.Empty;
                 if (productViewModel.Picture != null)
                 {
-                    var fileName = Guid.NewGuid().ToString();
-                    var fileExtension = Path.GetExtension(productViewModel.Picture.FileName);
-                    picturePath = $"/img/{fileName}{fileExtension}";
-                    using (var stream = System.IO.File.Create($"{_webHostEnvionment.WebRootPath}{picturePath}"))
-                    {
-                        await productViewModel.Picture.CopyToAsync(stream);
-                    }
+                    picturePath = await _fileService.CreateAsync(productViewModel.Picture);
                 }
 
                 await _productServices.CreateAsync(productViewModel.ToProduct(picturePath));

@@ -12,8 +12,9 @@ builder.Services.AddDbContext<ShoppingmallContext>(options =>
                 contextOptionsBuilder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
             }));
 
-builder.Services.AddTransient<IProductService, ProductService>();
 builder.Services.AddTransient<ICatalogService, CatalogService>();
+builder.Services.AddTransient<IFileService, FileService>();
+builder.Services.AddTransient<IProductService, ProductService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
