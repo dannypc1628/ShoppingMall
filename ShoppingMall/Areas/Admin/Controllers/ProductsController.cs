@@ -89,35 +89,31 @@ namespace ShoppingMall.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name,Summary,Description,UnitPrice,Count,CatalogId")] Product product)
+        public async Task<IActionResult> Edit(Guid id, ProductViewModel productViewModel)
         {
-            if (id != product.Id)
+            if (id != productViewModel.Id)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
+                var picturePath = string.Empty;
+                if (productViewModel.Picture != null)
                 {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
+                    picturePath = await _fileService.CreateAsync(productViewModel.Picture);
                 }
-                catch (DbUpdateConcurrencyException)
+
+                var product = await _productServices.UpdateAsync(productViewModel.ToProduct(picturePath));
+                if (product == null)
                 {
-                    if (!ProductExists(product.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    return NotFound();
                 }
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CatalogId"] = new SelectList(_context.Catalog, "Id", "Name", product.CatalogId);
-            return View(product);
+            ViewData["CatalogId"] = new SelectList(_context.Catalog, "Id", "Name", productViewModel.CatalogId);
+            return View(productViewModel);
         }
 
         // GET: Admin/Products/Delete/5
