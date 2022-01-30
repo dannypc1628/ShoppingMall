@@ -12,6 +12,7 @@ namespace ShoppingMall.Extensions
                 CatalogId = productViewModel.CatalogId,
                 Count = productViewModel.Count,
                 Description = productViewModel.Description,
+                Id = productViewModel.Id,
                 Name = productViewModel.Name,
                 PicturePath = string.IsNullOrWhiteSpace(picturePath) ? string.Empty : picturePath,
                 Summary = productViewModel.Summary,
