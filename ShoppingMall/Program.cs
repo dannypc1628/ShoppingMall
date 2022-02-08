@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ShoppingMall.Models;
+using ShoppingMall.Repositories;
 using ShoppingMall.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,7 @@ builder.Services.AddDbContext<ShoppingmallContext>(options =>
 builder.Services.AddTransient<ICatalogService, CatalogService>();
 builder.Services.AddTransient<IFileService, FileService>();
 builder.Services.AddTransient<IProductService, ProductService>();
+builder.Services.AddTransient<IProductRepository, ProductRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

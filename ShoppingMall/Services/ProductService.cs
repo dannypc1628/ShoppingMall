@@ -1,82 +1,41 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ShoppingMall.Models;
+﻿using ShoppingMall.Models;
+using ShoppingMall.Repositories;
 
 namespace ShoppingMall.Services
 {
     public class ProductService : IProductService
     {
-        private readonly ShoppingmallContext _context;
 
-        public readonly DbSet<Product> _products;
+        public readonly IProductRepository _products;
 
-        public ProductService(ShoppingmallContext context)
+        public ProductService(IProductRepository productRepository)
         {
-            _context = context;
-            _products = _context.Product;
+            _products = productRepository;
         }
 
         public async Task<IList<Product>> GetAllAsync()
         {
-            return await _products.Include(d => d.Catalog).ToListAsync();
+            return await _products.GetAllAsync();
         }
 
         public async Task<Product> GetAsync(Guid id)
         {
-            return await _products.Include(d => d.Catalog).FirstOrDefaultAsync(d => d.Id == id);
+            return await _products.GetAsync(id);
         }
 
         public async Task<Product> CreateAsync(Product product)
         {
-            product.Id = Guid.NewGuid();
-
-            _products.Add(product);
-            await _context.SaveChangesAsync();
-
-            return product;
+            return await _products.CreateAsync(product);
         }
 
         public async Task<Product> UpdateAsync(Product product)
         {
-            var orignalProduct = _products.Find(product.Id);
-
-            if (orignalProduct == null)
-            {
-                return null;
-            }
-
-            orignalProduct.CatalogId = product.CatalogId;
-            orignalProduct.Count = product.Count;
-            orignalProduct.Description = product.Description;
-            orignalProduct.Name = product.Name;
-            orignalProduct.PicturePath = product.PicturePath;
-            orignalProduct.Summary = product.Summary;
-            orignalProduct.UnitPrice = product.UnitPrice;
-
-            await _context.SaveChangesAsync();
-
-            return orignalProduct;
+            return await _products.UpdateAsync(product);
         }
 
         public async Task<bool> DeleteAsync(Guid id)
         {
-            var product = await _products.FindAsync(id);
-            if (product == null)
-            {
-                return false;
-            }
-
-            try
-            {
-                _products.Remove(product);
-                await _context.SaveChangesAsync(true);
-                return true;
-            }
-            catch (Exception ex)
-            {
-
-            }
-
-            return false;
+            return await _products.DeleteAsync(id);
         }
     }
 }
