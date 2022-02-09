@@ -1,36 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ShoppingMall.Models;
+using ShoppingMall.Services;
 
 namespace ShoppingMall.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly ShoppingmallContext _context;
+        private readonly IProductService _productService;
 
-        public ProductsController(ShoppingmallContext context)
+        public ProductsController(IProductService productService)
         {
-            _context = context;
+            _productService = productService;
         }
 
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            var shoppingmallContext = _context.Product.Include(p => p.Catalog);
-            return View(await shoppingmallContext.ToListAsync());
+            return View(await _productService.GetAllAsync());
         }
 
         // GET: Products/Details/5
-        public async Task<IActionResult> Details(Guid? id)
+        public async Task<IActionResult> Details(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Product
-                .Include(p => p.Catalog)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var product = await _productService.GetAsync(id);
             if (product == null)
             {
                 return NotFound();
