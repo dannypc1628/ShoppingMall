@@ -6,7 +6,7 @@ namespace ShoppingMall.Services
     public class ProductService : IProductService
     {
 
-        public readonly IProductRepository _products;
+        private readonly IProductRepository _products;
 
         public ProductService(IProductRepository productRepository)
         {
@@ -36,6 +36,11 @@ namespace ShoppingMall.Services
         public async Task<bool> DeleteAsync(Guid id)
         {
             return await _products.DeleteAsync(id);
+        }
+
+        public async Task<IList<Product>> FilterAsync(int pageNumber, int pageSize)
+        {
+            return await _products.FilterAsync(pageNumber, pageSize);
         }
     }
 }

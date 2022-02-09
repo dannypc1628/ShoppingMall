@@ -79,6 +79,13 @@ namespace ShoppingMall.Repositories
 
             return false;
         }
+        public async Task<IList<Product>> FilterAsync(int pageNumber = 1, int pageSize = 10)
+        {
+            pageNumber = pageNumber > 0 ? pageNumber : 1;
+            pageSize = pageSize > 0 ? pageSize : 10;
+
+            return await GetAllQuery().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+        }
 
         private IIncludableQueryable<Product, Catalog> GetAllQuery()
         {
