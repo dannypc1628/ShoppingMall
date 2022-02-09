@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using ShoppingMall.Models;
 
 namespace ShoppingMall.Repositories
@@ -7,9 +8,9 @@ namespace ShoppingMall.Repositories
     {
         private readonly ShoppingmallContext _context;
 
-        public readonly DbSet<Product> _products;
+        private readonly DbSet<Product> _products;
 
-        public ProductService(ShoppingmallContext context)
+        public ProductRepository(ShoppingmallContext context)
         {
             _context = context;
             _products = _context.Product;
@@ -17,12 +18,12 @@ namespace ShoppingMall.Repositories
 
         public async Task<IList<Product>> GetAllAsync()
         {
-            return await _products.Include(d => d.Catalog).ToListAsync();
+            return await GetAllQuery().ToListAsync();
         }
 
         public async Task<Product> GetAsync(Guid id)
         {
-            return await _products.Include(d => d.Catalog).FirstOrDefaultAsync(d => d.Id == id);
+            return await GetAllQuery().FirstOrDefaultAsync(d => d.Id == id);
         }
 
         public async Task<Product> CreateAsync(Product product)
@@ -37,24 +38,24 @@ namespace ShoppingMall.Repositories
 
         public async Task<Product> UpdateAsync(Product product)
         {
-            var orignalProduct = _products.Find(product.Id);
+            var originalProduct = await _products.FindAsync(product.Id);
 
-            if (orignalProduct == null)
+            if (originalProduct == null)
             {
                 return null;
             }
 
-            orignalProduct.CatalogId = product.CatalogId;
-            orignalProduct.Count = product.Count;
-            orignalProduct.Description = product.Description;
-            orignalProduct.Name = product.Name;
-            orignalProduct.PicturePath = product.PicturePath;
-            orignalProduct.Summary = product.Summary;
-            orignalProduct.UnitPrice = product.UnitPrice;
+            originalProduct.CatalogId = product.CatalogId;
+            originalProduct.Count = product.Count;
+            originalProduct.Description = product.Description;
+            originalProduct.Name = product.Name;
+            originalProduct.PicturePath = product.PicturePath;
+            originalProduct.Summary = product.Summary;
+            originalProduct.UnitPrice = product.UnitPrice;
 
             await _context.SaveChangesAsync();
 
-            return orignalProduct;
+            return originalProduct;
         }
 
         public async Task<bool> DeleteAsync(Guid id)
@@ -79,5 +80,9 @@ namespace ShoppingMall.Repositories
             return false;
         }
 
+        private IIncludableQueryable<Product, Catalog> GetAllQuery()
+        {
+            return _products.Include(d => d.Catalog);
+        }
     }
 }
