@@ -1,5 +1,6 @@
 ﻿using ShoppingMall.Models;
 using ShoppingMall.Repositories;
+using X.PagedList;
 
 namespace ShoppingMall.Services
 {
@@ -38,7 +39,7 @@ namespace ShoppingMall.Services
             return await _products.DeleteAsync(id);
         }
 
-        public async Task<IList<Product>> FilterAsync(int pageNumber, int pageSize)
+        public async Task<IPagedList<Product>> FilterAsync(int pageNumber, int pageSize)
         {
             return await _products.FilterAsync(pageNumber, pageSize);
         }

@@ -1,14 +1,11 @@
-﻿@model IEnumerable<ShoppingMall.Models.Product>
-
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@model IEnumerable<ShoppingMall.Models.Product>
 @{
-    ViewData["Title"] = "Index";
+    var pagedList = (IPagedList)Model;
 }
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -37,7 +34,7 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+    @foreach (var item in Model) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
@@ -66,6 +63,16 @@
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
-}
+    }
     </tbody>
 </table>
+
+@Html.PagedListPager(pagedList, 
+    pageNumber => Url.Action("Index", new { pageNumber, pageSize = pagedList.PageSize }),
+    new PagedListRenderOptions { 
+     LinkToFirstPageFormat = "首頁",
+     LinkToNextPageFormat = "下一頁",
+     LinkToPreviousPageFormat = "上一頁",
+     LinkToLastPageFormat = "末頁",
+     MaximumPageNumbersToDisplay = 5,
+     DisplayItemSliceAndTotal = false })

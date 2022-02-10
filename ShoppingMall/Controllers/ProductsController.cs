@@ -13,9 +13,9 @@ namespace ShoppingMall.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 3)
         {
-            return View(await _productService.GetAllAsync());
+            return View(await _productService.FilterAsync(pageNumber, pageSize));
         }
 
         // GET: Products/Details/5

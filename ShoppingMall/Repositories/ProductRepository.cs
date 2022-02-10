@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using ShoppingMall.Models;
+using X.PagedList;
 
 namespace ShoppingMall.Repositories
 {
@@ -79,12 +80,11 @@ namespace ShoppingMall.Repositories
 
             return false;
         }
-        public async Task<IList<Product>> FilterAsync(int pageNumber = 1, int pageSize = 10)
+        public async Task<IPagedList<Product>> FilterAsync(int pageNumber = 1, int pageSize = 10)
         {
             pageNumber = pageNumber > 0 ? pageNumber : 1;
             pageSize = pageSize > 0 ? pageSize : 10;
-
-            return await GetAllQuery().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            return await GetAllQuery().ToPagedListAsync(pageNumber, pageSize);
         }
 
         private IIncludableQueryable<Product, Catalog> GetAllQuery()

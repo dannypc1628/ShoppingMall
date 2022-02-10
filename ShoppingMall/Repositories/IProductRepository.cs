@@ -1,9 +1,10 @@
 ﻿using ShoppingMall.Models;
+using X.PagedList;
 
 namespace ShoppingMall.Repositories
 {
     public interface IProductRepository : IRepository<Product, Guid>
     {
-        Task<IList<Product>> FilterAsync(int pageNumber, int pageSize);
+        Task<IPagedList<Product>> FilterAsync(int pageNumber, int pageSize);
     }
 }
